@@ -1,0 +1,39 @@
+# 参考
+# https://catalina1344.hatenablog.jp/entry/2019/01/20/170821
+# docker logs [CONTAINER_NAME or CONTAINER_ID]
+version: "3"
+services:
+
+  # Elasticsearchのコンテナ
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    container_name: elasticsearch
+    # これよくわからん
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elastic-stack
+
+  # Logstashのコンテナ
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.5.0
+    container_name: logstash
+    volumes:
+      - "./pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf"
+    networks:
+      - elastic-stack
+
+  # Kibanaのコンテナ
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - elastic-stack
+
+networks:
+  elastic-stack:
